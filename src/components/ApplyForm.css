@@ -1,0 +1,89 @@
+.apply-form {
+  background: #f8fafb;
+  border-top: 3px solid #0066cc;
+  padding: 2rem;
+  margin-top: 2rem;
+  border-radius: 8px;
+}
+
+.apply-form h3 {
+  color: #003366;
+  font-size: 1.4rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.apply-form div {
+  margin-bottom: 1.25rem;
+}
+
+.apply-form label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #003366;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+}
+
+.apply-form input,
+.apply-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease;
+}
+
+.apply-form input:focus,
+.apply-form textarea:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.apply-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.apply-form button {
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  padding: 0.85rem 2rem;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease;
+}
+
+.apply-form button:hover {
+  background-color: #0055aa;
+}
+
+.apply-form button:active {
+  transform: scale(0.98);
+}
+
+.error {
+  color: #d32f2f;
+  font-weight: 600;
+  padding: 0.75rem;
+  background-color: #ffebee;
+  border-left: 4px solid #d32f2f;
+  border-radius: 4px;
+  margin-top: 0.75rem;
+}
+
+.apply-form > p {
+  color: #27ae60;
+  font-weight: 600;
+  background-color: #e8f5e9;
+  padding: 1rem;
+  border-left: 4px solid #27ae60;
+  border-radius: 4px;
+  margin: 0;
+}

@@ -1,0 +1,191 @@
+.job-detail {
+    padding: 3rem 2.5rem;
+    max-width: 880px;
+    margin: 3rem auto 4rem auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Header */
+.job-header {
+    margin-bottom: 2.5rem;
+}
+
+.job-detail h2 {
+    color: #003366;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 3px solid #0066cc;
+    padding-bottom: 0.75rem;
+}
+
+.job-detail p {
+    color: #555;
+    line-height: 1.8;
+}
+
+.job-detail strong {
+    color: #003366;
+    font-weight: 700;
+}
+
+/* Sections */
+.job-section {
+    margin-bottom: 2.2rem;
+}
+
+    .job-section h4 {
+        margin-bottom: 0.6rem;
+        color: #003366;
+    }
+
+/* Progress Bar */
+.progress-bar {
+    display: flex;
+    margin: 3rem 0 2.5rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.progress-step {
+    flex: 1;
+    padding: 0.8rem;
+    text-align: center;
+    border-bottom: 3px solid #ccc;
+    color: #777;
+}
+
+    .progress-step.active {
+        border-color: #003366;
+        color: #003366;
+    }
+
+/* Official Cards */
+.official-card {
+    margin-bottom: 2.5rem;
+    padding: 2rem;
+    background: #f9fbfd;
+    border-radius: 10px;
+    border: 1px solid #dde3ea;
+}
+
+    .official-card h3 {
+        margin-bottom: 1.8rem;
+        color: #003366;
+    }
+
+.instruction-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+/* Form */
+.form-group {
+    margin-bottom: 1.8rem;
+}
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.6rem;
+    }
+
+select,
+input[type="file"],
+input[type="email"],
+input[type="tel"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccd6dd;
+    border-radius: 6px;
+}
+
+/* Button */
+.primary-btn {
+    margin-top: 0.5rem;
+    padding: 0.9rem 1.8rem;
+    background-color: #003366;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700
+    }
+/* Payment Modal */
+.payment-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5); /* semi-transparent overlay */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #ffffff; /* match your .job-detail background */
+    padding: 2rem;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+    .modal-content h3 {
+        color: #003366;
+        margin-bottom: 1rem;
+    }
+
+    .modal-content p {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .modal-content input[type="text"] {
+        width: 100%;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ccd6dd;
+        border-radius: 6px;
+    }
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+    .modal-buttons .primary-btn {
+        background-color: #003366;
+        color: #fff;
+        padding: 0.7rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+    }
+
+    .modal-buttons .secondary-btn {
+        background-color: #dde3ea;
+        color: #003366;
+        padding: 0.7rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+    }
+
+/* Error inside modal */
+.modal-error {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 0.8rem;
+    text-align: center;
+}
+
