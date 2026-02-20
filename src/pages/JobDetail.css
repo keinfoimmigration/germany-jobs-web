@@ -290,3 +290,20 @@ input[type="tel"] {
             font-size: 0.85rem;
         }
 }
+/* SweetAlert Mobile Optimization */
+.swal2-popup {
+    font-family: inherit !important;
+}
+
+@media (max-width: 480px) {
+    .swal2-actions {
+        flex-direction: column !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .swal2-confirm,
+    .swal2-cancel {
+        width: 100% !important;
+    }
+}

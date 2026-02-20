@@ -1,5 +1,7 @@
 ﻿import { useState } from "react";
 import { supabase } from "../utils/supabaseClient";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 import "./JobDetail.css";
 
 export default function JobDetail() {
@@ -9,65 +11,40 @@ export default function JobDetail() {
     const [formData, setFormData] = useState({ email: "", phone: "" });
     const [error, setError] = useState("");
     const [saving, setSaving] = useState(false);
-    const [applicationNumber, setApplicationNumber] = useState("");
 
-    // Generate a unique application number
     const generateApplicationNumber = () => {
         const random = Math.floor(100000 + Math.random() * 900000);
         return `GK-${new Date().getFullYear()}-${random}`;
     };
 
     const handleAnswer = (question, value) => {
-        setAnswers((prev) => ({ ...prev, [question]: value }));
+        setAnswers(prev => ({ ...prev, [question]: value }));
     };
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleFileChange = (e) => {
+        setFiles({ ...files, [e.target.name]: e.target.files[0] });
+    };
+
     const proceedToDocuments = () => {
         if (!answers.q1 || !answers.q2 || !answers.q3) {
-            setError("All assessment questions must be answered before proceeding.");
+            setError("All assessment questions must be answered.");
             return;
         }
         setError("");
         setCurrentStep(2);
     };
 
-    const handleFileChange = (e) => {
-        setFiles({ ...files, [e.target.name]: e.target.files[0] });
-    };
-
-    // Upload file to Supabase Storage and return public URL
-    const uploadFile = async (file, folder) => {
-        if (!file) return null;
-
-        const filePath = `${folder}/${Date.now()}-${file.name}`;
-        const { error } = await supabase.storage
-            .from("applications")
-            .upload(filePath, file);
-
-        if (error) throw error;
-
-        const { data } = supabase.storage
-            .from("applications")
-            .getPublicUrl(filePath);
-
-        return data.publicUrl;
-    };
-
-    // Save application to Supabase DB
     const saveApplication = async () => {
         try {
             setSaving(true);
 
-            // Generate unique application number
             const appNumber = generateApplicationNumber();
-            setApplicationNumber(appNumber);
 
-           
-            // Insert into database
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from("applications")
                 .insert([
                     {
@@ -78,25 +55,24 @@ export default function JobDetail() {
                         relocate: answers.q2,
                         language: answers.q3,
                         status: "Pending Review"
-                    },
+                    }
                 ]);
 
             if (error) {
-                console.error("Error saving application:", error);
+                console.error(error);
                 setError("Failed to save application. Please try again.");
                 setSaving(false);
-                return false;
+                return null;
             }
 
-            console.log("Application saved:", data);
             setSaving(false);
-            return true;
+            return appNumber;
 
         } catch (err) {
             console.error(err);
-            setError("An unexpected error occurred while saving.");
+            setError("Unexpected error occurred.");
             setSaving(false);
-            return false;
+            return null;
         }
     };
 
@@ -113,9 +89,65 @@ export default function JobDetail() {
 
         setError("");
 
-        const saved = await saveApplication();
-        if (saved) {
-            setCurrentStep(3); // Show success step
+        const appNumber = await saveApplication();
+
+        if (appNumber) {
+            Swal.fire({
+                title: "Application Submitted Successfully",
+                html: `
+                    <div style="text-align:left; font-size:14px;">
+                        <p style="margin-bottom:10px;">
+                            Your application has been successfully received and is currently under review.
+                        </p>
+
+                        <div style="
+                            margin:15px 0;
+                            padding:14px;
+                            background:#f4f8fb;
+                            border-radius:8px;
+                            text-align:center;
+                        ">
+                            <div style="font-size:13px; color:#666;">
+                                Application Number
+                            </div>
+                            <div style="
+                                font-size:18px;
+                                font-weight:bold;
+                                color:#003366;
+                                margin-top:5px;
+                                word-break:break-word;
+                            ">
+                                ${appNumber}
+                            </div>
+                        </div>
+
+                        <p style="margin-top:10px;">
+                            Please keep this number safe. You can use it to check your application status.
+                        </p>
+                    </div>
+                `,
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonText: "Check Status",
+                confirmButtonColor: "#003366",
+                cancelButtonColor: "#6c757d",
+                width: "95%",
+                maxWidth: "420px",
+                padding: "1.5rem",
+                didOpen: () => {
+                    const popup = document.querySelector(".swal2-popup");
+                    popup.style.borderRadius = "12px";
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/checkstatus";
+                } else {
+                    setCurrentStep(1);
+                    setFormData({ email: "", phone: "" });
+                    setAnswers({});
+                    setFiles({});
+                }
+            });
         }
     };
 
@@ -132,107 +164,100 @@ export default function JobDetail() {
                 <div className={currentStep >= 2 ? "progress-step active" : "progress-step"}>
                     Applicant Information
                 </div>
-                <div className={currentStep === 3 ? "progress-step active" : "progress-step"}>
+                <div className="progress-step">
                     Application Submitted
                 </div>
             </div>
 
-            {/* STEP 1 — Assessment */}
             {currentStep === 1 && (
                 <section className="official-card">
                     <h3>Eligibility Assessment</h3>
+
                     <div className="form-group">
-                        <label>Do you possess a minimum of two (2) years professional experience? *</label>
+                        <label>Minimum 2 years experience? *</label>
                         <select onChange={(e) => handleAnswer("q1", e.target.value)}>
-                            <option value="">Select an option</option>
+                            <option value="">Select</option>
                             <option>Yes</option>
                             <option>No</option>
                         </select>
                     </div>
+
                     <div className="form-group">
-                        <label>Are you legally able and willing to relocate to Germany? *</label>
+                        <label>Willing to relocate to Germany? *</label>
                         <select onChange={(e) => handleAnswer("q2", e.target.value)}>
-                            <option value="">Select an option</option>
+                            <option value="">Select</option>
                             <option>Yes</option>
                             <option>No</option>
                         </select>
                     </div>
+
                     <div className="form-group">
-                        <label>Do you possess English or German language proficiency? *</label>
+                        <label>English or German proficiency? *</label>
                         <select onChange={(e) => handleAnswer("q3", e.target.value)}>
-                            <option value="">Select an option</option>
+                            <option value="">Select</option>
                             <option>Yes</option>
                             <option>No</option>
                         </select>
                     </div>
+
                     <button className="primary-btn" onClick={proceedToDocuments}>
                         Continue
                     </button>
                 </section>
             )}
 
-            {/* STEP 2 — Contact & Documents */}
             {currentStep === 2 && (
                 <section className="official-card">
                     <h3>Applicant Contact Information</h3>
+
                     <div className="form-group">
                         <label>Email Address *</label>
                         <input
                             type="email"
                             name="email"
-                            placeholder="example@email.com"
                             value={formData.email}
                             onChange={handleInputChange}
                         />
                     </div>
+
                     <div className="form-group">
                         <label>Mobile Number *</label>
                         <input
                             type="tel"
                             name="phone"
-                            placeholder="+254 700 000 000"
                             value={formData.phone}
                             onChange={handleInputChange}
                         />
                     </div>
 
-                    <h3 style={{ marginTop: "2rem" }}>Required Documentation</h3>
+                    <h3 style={{ marginTop: "2rem" }}>Required Documents</h3>
+
                     <div className="form-group">
-                        <label>National Identification Card (Front) *</label>
-                        <input type="file" name="idFront" accept="image/*,.pdf" onChange={handleFileChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>National Identification Card (Back) *</label>
-                        <input type="file" name="idBack" accept="image/*,.pdf" onChange={handleFileChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>Passport-Size Photograph *</label>
-                        <input type="file" name="passportPhoto" accept="image/*" onChange={handleFileChange} />
+                        <label>National ID (Front) *</label>
+                        <input type="file" name="idFront" onChange={handleFileChange} />
                     </div>
 
-                    <button className="primary-btn" onClick={submitApplication} disabled={saving}>
-                        {saving ? "Saving..." : "Submit Application"}
+                    <div className="form-group">
+                        <label>National ID (Back) *</label>
+                        <input type="file" name="idBack" onChange={handleFileChange} />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Passport Photo *</label>
+                        <input type="file" name="passportPhoto" onChange={handleFileChange} />
+                    </div>
+
+                    <button
+                        className="primary-btn"
+                        onClick={submitApplication}
+                        disabled={saving}
+                    >
+                        {saving ? "Submitting..." : "Submit Application"}
                     </button>
                 </section>
             )}
 
-            {/* STEP 3 — Success */}
-            {currentStep === 3 && (
-                <section className="success-card">
-                    <h3>Application Successfully Submitted</h3>
-                    <p>
-                        Your application has been received and is pending review.
-                    </p>
-                    <p>
-                        <strong>Application Number:</strong> {applicationNumber}
-                    </p>
-                    <p>
-                        You can check your application status using this number in the portal.
-                    </p>
-                </section>
-            )}
-
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="modal-error">{error}</div>}
         </div>
     );
 }
