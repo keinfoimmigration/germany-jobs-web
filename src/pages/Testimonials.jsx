@@ -9,28 +9,28 @@ export default function Testimonials() {
         {
             id: 1,
             name: "John Mwangi",
-            date: "2024-03-15",
+            date: "2025-03-15",
             story: "Thanks to this program, I secured a nursing job in Berlin within 6 months. The support throughout the visa process was incredible!",
             imageUrl: ""
         },
         {
             id: 2,
             name: "Grace Achieng",
-            date: "2024-05-10",
+            date: "2025-05-10",
             story: "I never thought working in Germany was possible until I joined this community. Now I’m happily employed in Munich!",
             imageUrl: ""
         },
         {
             id: 3,
             name: "Peter Otieno",
-            date: "2024-06-20",
+            date: "2025-06-20",
             story: "The guidance on documentation and interview preparation made all the difference. Highly recommend!",
             imageUrl: ""
         },
         {
             id: 4,
             name: "Faith Wanjiru",
-            date: "2024-07-01",
+            date: "2025-07-01",
             story: "Professional, supportive, and reliable. I’m now working in Frankfurt and living my dream.",
             imageUrl: ""
         },

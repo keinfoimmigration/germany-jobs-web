@@ -1,0 +1,236 @@
+/* Container */
+.check-status {
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Header */
+.check-status-header h2 {
+    color: #003366;
+    font-size: 2rem;
+    border-bottom: 3px solid #0066cc;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.instruction-text {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+/* Form Inputs */
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 6px;
+    border: 1px solid #ccd6dd;
+    font-size: 0.9rem;
+}
+
+/* Buttons */
+.primary-btn {
+    background-color: #003366;
+    color: #fff;
+    padding: 0.9rem 1.8rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.secondary-btn {
+    background-color: #dde3ea;
+    color: #003366;
+    padding: 0.9rem 1.8rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Application Grid */
+.application-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.2rem;
+    margin-top: 2rem;
+}
+
+.grid-item h4 {
+    margin-bottom: 0.3rem;
+    color: #003366;
+}
+
+.grid-item p {
+    color: #555;
+}
+
+/* Status Badges */
+.status-badge {
+    font-weight: 700;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    display: inline-block;
+    color: #fff;
+}
+
+.status-submitted {
+    background: #777;
+}
+
+.status-pending {
+    background: #f0ad4e;
+}
+
+.status-under-review {
+    background: #5bc0de;
+}
+
+.status-interview {
+    background: #f0ad4e;
+}
+
+.status-approved {
+    background: #28a745;
+}
+
+.status-rejected {
+    background: #dc3545;
+}
+
+.status-onhold {
+    background: #ffc107;
+}
+
+.status-other {
+    background: #6c757d;
+}
+
+/* Modal Overlay */
+.payment-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+/* Modal Box - Compact and Wider */
+.modal-content {
+    background: #fff;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    width: 400px; /* slightly wider */
+    max-width: 90%;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Instruction Box */
+.modal-instruction {
+    font-size: 0.78rem;
+    color: #333;
+    text-align: left;
+    background: #f2f7fb;
+    padding: 0.4rem;
+    border-radius: 5px;
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+}
+
+/* Modal Inputs */
+.modal-content input {
+    width: 100%;
+    padding: 0.4rem;
+    margin: 0.2rem 0;
+    border-radius: 5px;
+    border: 1px solid #ccd6dd;
+    font-size: 0.85rem;
+}
+
+/* Payment Box */
+.payment-box {
+    background: #e6f0fa;
+    border-radius: 5px;
+    padding: 0.4rem;
+    margin-bottom: 0.4rem;
+    text-align: left;
+}
+
+/* Modal Buttons */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    gap: 0.3rem;
+}
+
+    .modal-buttons .primary-btn,
+    .modal-buttons .secondary-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.83rem;
+        border-radius: 5px;
+    }
+
+/* Messages */
+.success-message,
+.error-message {
+    font-size: 0.78rem;
+    margin-top: 0.3rem;
+}
+
+/* Toast Notification - Top Center Slide */
+.toast-notification {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background-color: #28a745;
+    color: #fff;
+    padding: 0.8rem 1.2rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    font-weight: 700;
+    z-index: 2000;
+    opacity: 0;
+    animation: slideIn 0.4s forwards, slideOut 0.4s 3.6s forwards;
+}
+
+/* Slide In */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Slide Out */
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+}
