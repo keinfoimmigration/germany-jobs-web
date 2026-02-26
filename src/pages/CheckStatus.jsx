@@ -162,7 +162,7 @@ export default function CheckStatus() {
                             {application.interview_time && <div className="grid-item"><h4>Interview Time</h4><p>{application.interview_time}</p></div>}
                         </div>
 
-                        {application.status === "Interview Scheduled" && (
+                        {application.status === " " && (
                             <button className="primary-btn" onClick={() => setShowModal(true)}>
                                 Book Interview
                             </button>

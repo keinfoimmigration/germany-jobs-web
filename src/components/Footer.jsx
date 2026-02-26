@@ -61,7 +61,7 @@ export default function Footer() {
                 <div className="footer-section footer-contact">
                     <h4>Official Contact</h4>
                     <p><strong>Email:</strong> info@immigration-portal.de</p>
-                    <p><strong>WhatsApp Number:</strong> +254706059826</p>
+                    <p><strong>WhatsApp Number:</strong> +254140526299</p>
                     <p><strong>Office:</strong> Nairobi, Kenya</p>
 
                     <div className="footer-ecitizen">
