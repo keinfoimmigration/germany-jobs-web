@@ -109,6 +109,19 @@ input[type="tel"] {
     border-radius: 6px;
 }
 
+.phone-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.country-code-select {
+    width: 130px !important;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
 /* Button */
 .primary-btn {
     margin-top: 0.5rem;

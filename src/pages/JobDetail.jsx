@@ -8,9 +8,18 @@ export default function JobDetail() {
     const [currentStep, setCurrentStep] = useState(1);
     const [answers, setAnswers] = useState({});
     const [files, setFiles] = useState({});
-    const [formData, setFormData] = useState({ email: "", phone: "" });
+    const [formData, setFormData] = useState({ email: "", phone: "", countryCode: "+254" });
     const [error, setError] = useState("");
     const [saving, setSaving] = useState(false);
+    
+    const countryFlags = {
+        "+254": "🇰🇪",
+        "+49": "🇩🇪",
+        "+255": "🇹🇿",
+        "+256": "🇺🇬",
+        "+1": "🇺🇸",
+        "+44": "🇬🇧"
+    };
 
     const generateApplicationNumber = () => {
         const random = Math.floor(100000 + Math.random() * 900000);
@@ -50,7 +59,7 @@ export default function JobDetail() {
                     {
                         application_number: appNumber,
                         email: formData.email,
-                        phone: formData.phone,
+                        phone: `${formData.countryCode}${formData.phone}`,
                         experience: answers.q1,
                         relocate: answers.q2,
                         language: answers.q3,
@@ -174,7 +183,7 @@ export default function JobDetail() {
                     <h3>Eligibility Assessment</h3>
 
                     <div className="form-group">
-                        <label>Minimum 2 years experience? *</label>
+                        <label>Minimum 2 years experience Working? *</label>
                         <select onChange={(e) => handleAnswer("q1", e.target.value)}>
                             <option value="">Select</option>
                             <option>Yes</option>
@@ -183,7 +192,7 @@ export default function JobDetail() {
                     </div>
 
                     <div className="form-group">
-                        <label>Willing to relocate to Germany? *</label>
+                        <label>Are you prepared to relocate to the Federal Republic of Germany upon successful issuance of a Work Visa? *</label>
                         <select onChange={(e) => handleAnswer("q2", e.target.value)}>
                             <option value="">Select</option>
                             <option>Yes</option>
@@ -222,12 +231,27 @@ export default function JobDetail() {
 
                     <div className="form-group">
                         <label>Mobile Number *</label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                        />
+                        <div className="phone-input-group">
+                            <select
+                                name="countryCode"
+                                value={formData.countryCode}
+                                onChange={handleInputChange}
+                                className="country-code-select"
+                            >
+                                {Object.entries(countryFlags).map(([code, flag]) => (
+                                    <option key={code} value={code}>
+                                        {flag} {code}
+                                    </option>
+                                ))}
+                            </select>
+                            <input
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                placeholder="712345678"
+                            />
+                        </div>
                     </div>
 
                     <h3 style={{ marginTop: "2rem" }}>Required Documents</h3>
