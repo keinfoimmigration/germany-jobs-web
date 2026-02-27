@@ -55,32 +55,37 @@ export default function Home() {
 
             {/* How It Works Section */}
             <section className="intro">
-                <h2>How It Works: From Application to Interview</h2>
+                <h2>How It Works: Simple Application Process</h2>
                 <div className="steps">
                     <div className="step">
                         <div className="step-number">1</div>
-                        <h4>Explore Jobs</h4>
-                        <p>Browse 40+ curated job listings from verified German employers across Berlin, Munich, Frankfurt, and more.</p>
+                        <h4>Click Apply Now</h4>
+                        <p>Click on the <strong>Apply Now</strong> button on the top right of the page to start your journey.</p>
                     </div>
                     <div className="step">
                         <div className="step-number">2</div>
-                        <h4>Submit Application</h4>
-                        <p>Upload your ID (front & back) and passport photo using our secure portal.</p>
+                        <h4>Fill & Submit</h4>
+                        <p>Complete the <strong>Eligibility Assessment</strong> and <strong>Applicant Information</strong>, then submit your application.</p>
                     </div>
                     <div className="step">
                         <div className="step-number">3</div>
-                        <h4>Check Status</h4>
-                        <p>Use your Application Number or Mobile Number in the portal to track your application progress.</p>
+                        <h4>Save App Number</h4>
+                        <p>After successful submission, an <strong>Application Number</strong> will be generated. Save this number to trace your status.</p>
                     </div>
                     <div className="step">
                         <div className="step-number">4</div>
-                        <h4>Book Interview</h4>
-                        <p>Once your application is reviewed, book your preferred interview date and time. Our team will call you to confirm the details. 🌟</p>
+                        <h4>Check Status</h4>
+                        <p>Click <strong>Check Status</strong> on the top right and enter your application number or mobile number to track progress.</p>
+                    </div>
+                    <div className="step">
+                        <div className="step-number">5</div>
+                        <h4>Wait for Outreach</h4>
+                        <p>Our team will reach out to guide you through the next stages of your application once reviewed.</p>
                     </div>
                 </div>
                 <p className="intro-text">
                     This portal is your official gateway connecting Kenyan professionals with career opportunities in Germany.
-                    Follow the steps above to apply with confidence. After booking your interview, relax and get ready—our team will reach out to guide you through the next stage of your exciting journey abroad.
+                    Follow these simple steps to launch your international career today!
                 </p>
             </section>
         </div>
