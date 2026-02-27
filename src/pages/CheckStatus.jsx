@@ -177,7 +177,7 @@ export default function CheckStatus() {
                     <div className="modal-content">
                         <h3>Book Your Interview</h3>
                         <p className="modal-instruction">
-                            1. Pay Ksh 1,000 via M-Pesa to Till Number: <strong>{tillNumber}</strong>.<br />
+                            1. Pay an administrative fee of Ksh 1,000.<br />
                             2. Enter your M-Pesa transaction code and verify.<br />
                             3. Select your preferred interview date and time.<br />
                             4. Submit your booking to confirm.
