@@ -11,11 +11,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing email or application number' });
   }
 
-  // Use the credentials provided by the user
+  // Use robust settings for cloud environments (Port 587 is more reliable than 465)
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL
+    port: 587,
+    secure: false, // Use STARTTLS
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,

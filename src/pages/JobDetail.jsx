@@ -141,7 +141,7 @@ export default function JobDetail() {
         if (appNumber) {
             // Send confirmation email
             try {
-                await fetch("/api/send-confirmation", {
+                const response = await fetch("/api/send-confirmation", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -149,8 +149,13 @@ export default function JobDetail() {
                         applicationNumber: appNumber
                     })
                 });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("API Error Response:", errorData);
+                }
             } catch (err) {
-                console.error("Failed to send confirmation email:", err);
+                console.error("Fetch Network Error:", err);
             }
 
             Swal.fire({
