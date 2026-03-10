@@ -1,0 +1,317 @@
+.admin-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f8fafc;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-content h1 {
+    color: #003366;
+    margin: 0;
+    font-size: 2rem;
+}
+
+.header-content p {
+    color: #64748b;
+    margin: 0.5rem 0 0;
+}
+
+.search-box input {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    width: 300px;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #003366;
+    box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #003366;
+}
+
+.stat-card h3 {
+    color: #64748b;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin: 0;
+}
+
+.stat-number {
+    color: #003366;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0.5rem 0 0;
+}
+
+.applicant-list-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+.applicant-list-card h2 {
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.admin-table th {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    padding: 1rem;
+    font-size: 0.875rem;
+}
+
+.admin-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.ref-no {
+    font-weight: 600;
+    color: #003366;
+    font-family: monospace;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-info .email {
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.contact-info .phone {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.pending-review {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.under-review {
+    background-color: #e0f2fe;
+    color: #075985;
+}
+
+.status-badge.interview, .status-badge.shortlisted {
+    background-color: #f5f3ff;
+    color: #5b21b6;
+}
+
+.status-badge.approved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.send-sms-btn {
+    background-color: #003366;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.send-sms-btn:hover:not(:disabled) {
+    background-color: #002244;
+    transform: translateY(-1px);
+}
+
+.send-sms-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.empty-state {
+    text-align: center;
+    color: #64748b;
+    padding: 3rem !important;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: #003366;
+}
+
+.sent-badge {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.bulk-notify-btn {
+    background: linear-gradient(135deg, #003366 0%, #0055aa 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 51, 102, 0.2);
+    transition: all 0.3s ease;
+}
+
+.bulk-notify-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 51, 102, 0.3);
+}
+
+.quick-notify-btn {
+    background-color: transparent;
+    border: 1px solid #003366;
+    color: #003366;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-notify-btn:hover:not(:disabled) {
+    background-color: #003366;
+    color: white;
+}
+
+.approved-specific-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.send-email-btn {
+    background-color: #0369a1;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+}
+
+.send-email-btn:hover:not(:disabled) {
+    background-color: #0c4a6e;
+    transform: translateY(-1px);
+}
+
+.nudge-job-btn {
+    background-color: #f59e0b;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+}
+
+.nudge-job-btn:hover:not(:disabled) {
+    background-color: #d97706;
+    transform: translateY(-1px);
+}
+
+.sent-history {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 1rem;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    .search-box input {
+        width: 100%;
+    }
+}
