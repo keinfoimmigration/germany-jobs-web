@@ -1,4 +1,5 @@
-import { https } from 'follow-redirects';
+import pkg from 'follow-redirects';
+const { https } = pkg;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
