@@ -4,76 +4,76 @@ import './Testimonials.css';
 export default function Testimonials() {
     const perPage = 4;
 
-    // ✅ Dummy testimonials data
+    // ✅ Fresh dummy testimonials data
     const testimonialsData = [
         {
-            id: 7,
-            name: "Cynthia Maina",
-            date: "2026-03-03", // 3 days ago from March 6
-            story: "Just received my visa approval today! The level of professionalism and support from this team is unmatched. I'll be flying to Hamburg next month!",
-            imageUrl: ""
-        },
-        {
-            id: 8,
-            name: "Juma Bakari",
-            date: "2026-02-20", // About 2 weeks ago
-            story: "The interview prep was the key for me. I felt so confident during my interview with the German employer. I'm officially a tech lead in Stuttgart now!",
-            imageUrl: ""
-        },
-        {
-            id: 9,
-            name: "Amina Hassan",
-            date: "2026-02-20", // 2 weeks ago
-            story: "I was skeptical at first, but every step was transparent. From data submission to job offer, it took less than 4 months. Highly recommended for everyone.",
-            imageUrl: ""
-        },
-        {
-            id: 10,
-            name: "Samuel Omondi",
-            date: "2026-02-15",
-            story: "Moving to Germany as a nurse seemed like a mountain, but this community made it a smooth walk. I'm now settled in Berlin and loving the city!",
-            imageUrl: ""
-        },
-        {
             id: 1,
-            name: "Beatrice Anyango",
-            date: "2025-03-15",
-            story: "Thanks to this program, I secured a nursing job in Berlin within 6 months. The support throughout the visa process was incredible!",
+            name: "Florence Atieno",
+            date: "2026-02-17", 
+            story: "Securing a hospitality role in Munich was so seamless. The portal's guidance on the German culture and language basics was a game-changer for my first week!",
             imageUrl: ""
         },
         {
             id: 2,
-            name: "Evans Kiprotich",
-            date: "2025-05-10",
-            story: "I never thought working in Germany was possible until I joined this community. Now I’m happily employed in Munich!",
+            name: "Kennedy Mutua",
+            date: "2026-02-15", 
+            story: "I never thought my agricultural skills would take me to Europe. I'm now working in a sustainable farm in Bavaria. The processing was transparent all the way!",
             imageUrl: ""
         },
         {
             id: 3,
-            name: "Scolastica Mutua",
-            date: "2025-06-20",
-            story: "The guidance on documentation and interview preparation made all the difference. Highly recommend!",
+            name: "Mercy Chemutai",
+            date: "2026-02-10", 
+            story: "The caregiver program is incredible. I'm settled in Hamburg now, and the support I received for my visa and housing was top-notch. Highly recommend!",
             imageUrl: ""
         },
         {
             id: 4,
-            name: "Derrick Wafula",
-            date: "2025-07-01",
-            story: "Professional, supportive, and reliable. I’m now working in Frankfurt and living my dream.",
+            name: "Peter Kamau",
+            date: "2026-02-05",
+            story: "Landed a construction role in Berlin through this portal. The 500+ job listings gave me so many options. Asante sana for this life-changing opportunity.",
             imageUrl: ""
         },
         {
             id: 5,
-            name: "Lilian Kerubo",
-            date: "2024-08-12",
-            story: "Clear process, step-by-step assistance, and amazing mentorship. Germany is now my second home!",
+            name: "Sarah Wambui",
+            date: "2026-01-28",
+            story: "Moving as a professional seemed daunting, but the mentorship here made it a smooth walk. I'm now a hospitality lead in Stuttgart and loving it!",
             imageUrl: ""
         },
         {
             id: 6,
-            name: "Mohamed Ali",
-            date: "2024-09-05",
-            story: "From language training to job placement, everything was handled professionally. Thank you!",
+            name: "David Ochieng",
+            date: "2026-01-20",
+            story: "The interview preparation sessions helped me secure a logistics job in Frankfurt. I felt so confident talking to my German employers.",
+            imageUrl: ""
+        },
+        {
+            id: 7,
+            name: "Lydia Nekesa",
+            date: "2026-01-12",
+            story: "I applied for a cleaning services role and got approved within 3 months. Everything from documentation to travel was handled with care.",
+            imageUrl: ""
+        },
+        {
+            id: 8,
+            name: "Evans Kipkirui",
+            date: "2026-01-05",
+            story: "Professionalism at its best. I'm now working in a warehouse in Cologne. They really keep their word on assisting Kenyans to work in Germany.",
+            imageUrl: ""
+        },
+        {
+            id: 9,
+            name: "Zainab Juma",
+            date: "2025-12-28",
+            story: "The community here is amazing. Being a caregiver in Berlin is fulfilling, and the transition was made easy by the step-by-step process on this portal.",
+            imageUrl: ""
+        },
+        {
+            id: 10,
+            name: "Samuel Baraza",
+            date: "2025-12-15",
+            story: "Start Your Journey today! I'm officially a technician in Dusseldorf. Don't hesitate to apply if you have the skills. Germany is waiting!",
             imageUrl: ""
         }
     ];
