@@ -174,7 +174,7 @@ app.post('/api/send-sms', async (req, res) => {
 });
 
 app.post('/api/send-job-notify', async (req, res) => {
-  const { email, applicationNumber } = req.body;
+  const { email, applicationNumber, phone } = req.body;
   console.log(`[Email] Attempting to send job notification to: ${email} for app: ${applicationNumber}`);
 
   if (!email || !applicationNumber) {
@@ -229,7 +229,31 @@ app.post('/api/send-job-notify', async (req, res) => {
     console.log('[Email] Sending via Nodemailer...');
     const info = await transporter.sendMail(mailOptions);
     console.log('[Email] SUCCESS - Message sent. ID:', info.messageId);
-    console.log('[Email] Accepted by:', info.accepted);
+    
+    // Update Supabase to record the JobChoice notification
+    if (applicationNumber) {
+        try {
+            await supabase
+                .from('applications')
+                .update({ 
+                    last_sms_stage: 'JobChoice',
+                    last_sms_at: new Date().toISOString()
+                })
+                .eq('application_number', applicationNumber);
+            
+            // Also try to append to stages if phone is provided
+            if (phone) {
+                await supabase.rpc('append_sms_stage', { 
+                    applicant_phone: phone, 
+                    new_stage: 'JobChoice' 
+                });
+            }
+            console.log('[Email] DB Updated for', applicationNumber);
+        } catch (dbErr) {
+            console.warn('[Email] DB Update failed:', dbErr.message);
+        }
+    }
+
     res.status(200).json({ message: 'Job notification email sent successfully', messageId: info.messageId });
   } catch (error) {
     console.error('[Email] Nodemailer Error:', error.message);

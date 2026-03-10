@@ -146,7 +146,7 @@ export default function Cynthia() {
             const emailPromise = fetch("/api/send-job-notify", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: app.email, applicationNumber: app.application_number })
+                body: JSON.stringify({ email: app.email, applicationNumber: app.application_number, phone: app.phone })
             });
 
             const [smsRes, emailRes] = await Promise.all([smsPromise, emailPromise]);
