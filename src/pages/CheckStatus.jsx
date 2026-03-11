@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
@@ -103,7 +103,6 @@ export default function CheckStatus() {
     const [selectedSubJob, setSelectedSubJob] = useState("");
     const [jobRemarks, setJobRemarks] = useState("");
     const [jobSaving, setJobSaving] = useState(false);
-
     const tillNumber = "4139224"; // Replace with actual till number
 
     // Check application status
@@ -123,6 +122,7 @@ export default function CheckStatus() {
 
         setLoading(false);
     };
+
 
     // Verify M-Pesa payment
     const verifyPayment = async () => {
@@ -241,6 +241,7 @@ export default function CheckStatus() {
             case "Approved": return "status-badge status-approved";
             case "Rejected": return "status-badge status-rejected";
             case "On Hold": return "status-badge status-onhold";
+            case "Visa processing in progress": return "status-badge status-visa";
             default: return "status-badge status-other";
         }
     };
@@ -258,58 +259,58 @@ export default function CheckStatus() {
             </header>
 
             <section className="status-card">
-                <div className="form-group">
-                    <label htmlFor="searchInput">Application Number or Mobile Number</label>
-                    <input
-                        id="searchInput"
-                        type="text"
-                        placeholder="e.g. GK-2026-123456 or +254700000000"
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                    />
-                </div>
-
-                <button className="primary-btn" onClick={checkStatus} disabled={loading}>
-                    {loading ? "Searching..." : "Check Status"}
-                </button>
-
-                {error && <div className="error-message">{error}</div>}
-
-                {application && (
-                    <>
-                        <div className="application-grid">
-                            <div className="grid-item"><h4>Application Number</h4><p>{application.application_number}</p></div>
-                            <div className="grid-item status-item">
-                                <h4>Status</h4>
-                                <div className="status-flex">
-                                    <p className={getStatusClass(application.status)}>{application.status}</p>
-                                    {application.status === "Approved" && (
-                                        <button className="primary-btn select-job-btn-mini" onClick={() => setShowJobModal(true)}>
-                                            Select Job
-                                        </button>
-                                    )}
-                                </div>
-                                {application.selected_job && (
-                                    <div className="selection-badge">
-                                        Selected: {application.selected_sub_job}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="grid-item"><h4>Email</h4><p>{application.email}</p></div>
-                            <div className="grid-item"><h4>Phone</h4><p>{application.phone}</p></div>
-                            <div className="grid-item"><h4>Submitted On</h4><p>{new Date(application.created_at).toLocaleDateString()}</p></div>
-                            {application.interview_date && <div className="grid-item"><h4>Interview Date</h4><p>{application.interview_date}</p></div>}
-                            {application.interview_time && <div className="grid-item"><h4>Interview Time</h4><p>{application.interview_time}</p></div>}
+                        <div className="form-group">
+                            <label htmlFor="searchInput">Application Number or Mobile Number</label>
+                            <input
+                                id="searchInput"
+                                type="text"
+                                placeholder="e.g. GK-2026-123456 or +254700000000"
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                            />
                         </div>
 
-                        {application.status === "Interview Scheduled" && (
-                            <button className="primary-btn" onClick={() => setShowModal(true)}>
-                                Book Interview
-                            </button>
+                        <button className="primary-btn" onClick={checkStatus} disabled={loading}>
+                            {loading ? "Searching..." : "Check Status"}
+                        </button>
+
+                        {error && <div className="error-message">{error}</div>}
+
+                        {application && (
+                            <>
+                                <div className="application-grid">
+                                    <div className="grid-item"><h4>Application Number</h4><p>{application.application_number}</p></div>
+                                    <div className="grid-item status-item">
+                                        <h4>Status</h4>
+                                        <div className="status-flex">
+                                            <p className={getStatusClass(application.status)}>{application.status}</p>
+                                            {application.status === "Approved" && (
+                                                <button className="primary-btn select-job-btn-mini" onClick={() => setShowJobModal(true)}>
+                                                    Select Job
+                                                </button>
+                                            )}
+                                        </div>
+                                        {application.selected_job && (
+                                            <div className="selection-badge">
+                                                Selected: {application.selected_sub_job}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="grid-item"><h4>Email</h4><p>{application.email}</p></div>
+                                    <div className="grid-item"><h4>Phone</h4><p>{application.phone}</p></div>
+                                    <div className="grid-item"><h4>Submitted On</h4><p>{new Date(application.created_at).toLocaleDateString()}</p></div>
+                                    {application.interview_date && <div className="grid-item"><h4>Interview Date</h4><p>{application.interview_date}</p></div>}
+                                    {application.interview_time && <div className="grid-item"><h4>Interview Time</h4><p>{application.interview_time}</p></div>}
+                                </div>
+
+                                {application.status === "Interview Scheduled" && (
+                                    <button className="primary-btn" onClick={() => setShowModal(true)}>
+                                        Book Interview
+                                    </button>
+                                )}
+                            </>
                         )}
-                    </>
-                )}
-            </section>
+                    </section>
 
             {/* Modal */}
             {showModal && (

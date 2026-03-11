@@ -18,7 +18,12 @@ const app = express();
 const port = 5000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'OK', version: '1.0.1', message: 'PDF route is active' });
+});
 
 // Routes
 app.post('/api/send-confirmation', async (req, res) => {
@@ -100,7 +105,10 @@ app.get('/api/get-applicants', async (req, res) => {
 
 app.post('/api/send-sms', async (req, res) => {
   const { phone, message, stage, applicationNumber } = req.body;
-  if (!phone || !message || !stage) return res.status(400).json({ error: 'Missing phone, message or stage' });
+  if (!phone || !message || !stage) {
+    console.warn(`[SMS] 400 - Missing fields: phone=${!!phone}, message=${!!message}, stage=${!!stage}`);
+    return res.status(400).json({ error: 'Missing phone, message or stage' });
+  }
 
   // 1. Check if this stage was already sent (Backend safety)
   try {
@@ -110,15 +118,25 @@ app.post('/api/send-sms', async (req, res) => {
       .eq('phone', phone)
       .single();
 
-    if (!fetchError && appData?.sent_sms_stages?.includes(stage)) {
+    if (!fetchError && appData?.sent_sms_stages?.includes(stage) && stage !== 'DocSent') {
+      console.log(`[SMS] 400 - Duplicate prevented for stage: ${stage}`);
       return res.status(400).json({ error: `SMS for stage "${stage}" has already been sent to this applicant.` });
     }
   } catch (e) {
     console.warn('Duplicate check warning:', e.message);
   }
 
-  let formattedPhone = phone;
-  if (formattedPhone.startsWith('+254')) formattedPhone = '0' + formattedPhone.slice(4);
+  // 2. Format phone for EMREIGN (Usually prefers 2547... or 07...)
+  let formattedPhone = phone.trim().replace(/\s+/g, '');
+  if (formattedPhone.startsWith('+254')) {
+    formattedPhone = '254' + formattedPhone.slice(4);
+  } else if (formattedPhone.startsWith('0')) {
+    formattedPhone = '254' + formattedPhone.slice(1);
+  } else if (formattedPhone.startsWith('7')) {
+    formattedPhone = '254' + formattedPhone;
+  }
+  
+  console.log(`[SMS] Sending to: ${formattedPhone} (Original: ${phone})`);
 
   const options = {
     'method': 'GET',
@@ -140,6 +158,8 @@ app.post('/api/send-sms', async (req, res) => {
     });
 
     if (apiResponse.status >= 200 && apiResponse.status < 300) {
+      console.log(`[SMS] Provider Response Body: ${apiResponse.data}`);
+      
       // 2. Update the database array to record this stage
       const { error: dbError } = await supabase.rpc('append_sms_stage', { 
         applicant_phone: phone, 
@@ -214,6 +234,10 @@ app.post('/api/send-job-notify', async (req, res) => {
           <p style="color: #333;">Please log in to our portal to select your preferred role from over <strong>500+ exciting opportunities</strong> currently available.</p>
           <a href="https://kenyagermany-jobs.vercel.app/checkstatus" style="display: inline-block; background: #003366; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">Select Your Job Now</a>
         </div>
+
+        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; border: 1px solid #bae6fd; margin-top: 20px;">
+           <p style="font-size: 14px; color: #0369a1; margin: 0;"><strong>Pro-Tip:</strong> Once you select a job, you will receive your Official Placement Document. You will then need to confirm acceptance to begin your <strong>Visa Processing</strong>.</p>
+        </div>
         
         <p>If you have any questions, our support team is here to help.</p>
         
@@ -233,6 +257,12 @@ app.post('/api/send-job-notify', async (req, res) => {
     // Update Supabase to record the JobChoice notification
     if (applicationNumber) {
         try {
+            const { data: currentApp } = await supabase
+                .from('applications')
+                .select('sent_sms_stages')
+                .eq('application_number', applicationNumber)
+                .single();
+
             await supabase
                 .from('applications')
                 .update({ 
@@ -241,8 +271,8 @@ app.post('/api/send-job-notify', async (req, res) => {
                 })
                 .eq('application_number', applicationNumber);
             
-            // Also try to append to stages if phone is provided
-            if (phone) {
+            // Only append stage if not already present
+            if (phone && (!currentApp?.sent_sms_stages || !currentApp.sent_sms_stages.includes('JobChoice'))) {
                 await supabase.rpc('append_sms_stage', { 
                     applicant_phone: phone, 
                     new_stage: 'JobChoice' 
@@ -258,6 +288,135 @@ app.post('/api/send-job-notify', async (req, res) => {
   } catch (error) {
     console.error('[Email] Nodemailer Error:', error.message);
     res.status(500).json({ error: 'Failed to send notification email', details: error.message });
+  }
+});
+
+app.post('/api/send-official-pdf', async (req, res) => {
+  console.log('[Official PDF] POST /api/send-official-pdf');
+  const { pdfBase64, email, applicationNumber, phone } = req.body;
+  
+  if (!pdfBase64) { console.warn('[Official PDF] pdfBase64 is missing'); }
+  if (!email) { console.warn('[Official PDF] email is missing'); }
+  if (!applicationNumber) { console.warn('[Official PDF] applicationNumber is missing'); }
+
+  console.log(`[Official PDF] Attempting to send document to: ${email} for app: ${applicationNumber}`);
+
+  if (!pdfBase64 || !email || !applicationNumber) {
+    console.warn('[Official PDF] Missing required fields');
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"Germany Jobs Official" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: `OFFICIAL DOCUMENT: Germany Jobs Application - ${applicationNumber}`,
+    text: `Find attached your official Germany Jobs application document.\n\nThis document confirms your job selection and application status.\n\nIf you have any issues, please reach us for support.\n\nBest regards,\nGermany Jobs Team`,
+    html: `
+      <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; padding: 30px; border-radius: 12px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 25px;">
+           <h2 style="color: #003366; margin: 0; font-size: 24px;">Official Employment Offer Notification</h2>
+           <p style="color: #64748b; font-size: 14px;">Federal Bureau of Immigration & Global Employment</p>
+        </div>
+
+        <p>Dear Candidate,</p>
+        <p>Congratulations! Your application for the <strong>Germany Jobs</strong> program has been successful. Please find your official job placement document attached to this email.</p>
+        
+        <div style="background: #f0fdf4; padding: 25px; border-radius: 10px; text-align: center; margin: 25px 0; border: 1px solid #dcfce7;">
+          <h3 style="margin: 0 0 10px 0; color: #166534;">Offer Ref: ${applicationNumber}</h3>
+          <p style="color: #15803d; margin-bottom: 20px; font-weight: 500;">Please click the button below to formally accept this employment offer.</p>
+          <a href="http://localhost:5173/confirm?ref=${applicationNumber}" 
+             style="background-color: #003366; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+             ACCEPT EMPLOYMENT OFFER (LOCAL TEST)
+          </a>
+        </div>
+
+        <div style="background: #fffbeb; padding: 20px; border-radius: 10px; border: 1px solid #fef3c7; margin-bottom: 25px;">
+          <h4 style="color: #92400e; margin-top: 0; display: flex; align-items: center; gap: 8px;">
+            ⚠️ IMPORTANT: NEXT STEPS
+          </h4>
+          <p style="font-size: 14px; color: #78350f;">
+            Upon your formal acceptance, we will immediately <strong>initiate the Visa Processing protocol</strong> with the German Federal Authorities. 
+            To ensure a smooth transition, please begin preparing the following standard documents immediately:
+          </p>
+          <ul style="font-size: 14px; color: #78350f; padding-left: 20px;">
+            <li><strong>Original National ID Card</strong> (Mandatory for verification)</li>
+            <li><strong>Relevant Professional Certifications</strong> & Job-specific Documents</li>
+            <li><strong>Current Passport Photographs</strong> (White background)</li>
+            <li><strong>International Passport</strong> (If you already possess one)</li>
+            <li><strong>The Attached Official Document</strong> (Printed copy)</li>
+          </ul>
+        </div>
+        
+        <p style="font-size: 14px;"><strong>Support:</strong> If you have any questions regarding the visa process or your assignment, please respond to this email or contact our regional coordination office.</p>
+        
+        <p style="margin-top: 35px; border-top: 1px solid #eee; padding-top: 20px;">
+          Best regards,<br>
+          <strong style="color: #003366;">Administrative Director</strong><br>
+          <span style="font-size: 13px; color: #64748b;">Germany Jobs Immigration Division</span>
+        </p>
+        
+        <div style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 30px;">
+          This is an official institutional document. Please do not share sensitive application details publicly.<br>
+          <span style="color: #f8fafc;">Message Ref: ${Date.now()}</span>
+        </div>
+      </div>
+    `,
+    attachments: [
+      {
+        filename: `GermanyJobs_Official_${applicationNumber}.pdf`,
+        content: pdfBase64.split('base64,')[1],
+        encoding: 'base64'
+      }
+    ]
+  };
+
+  try {
+    console.log('[Official PDF] Sending email...');
+    await transporter.sendMail(mailOptions);
+    console.log('[Official PDF] SUCCESS - Email sent');
+    
+    // Update Supabase
+    const { data: currentApp } = await supabase
+      .from('applications')
+      .select('sent_sms_stages, phone')
+      .eq('application_number', applicationNumber)
+      .single();
+
+    const { error: updateError } = await supabase
+      .from('applications')
+      .update({ 
+          last_sms_stage: 'DocSent',
+          last_sms_at: new Date().toISOString(),
+          official_document_sent: 1
+      })
+      .eq('application_number', applicationNumber);
+
+    if (updateError) {
+        console.warn('[Official PDF] DB Update failed:', updateError.message);
+    }
+
+    const targetPhone = phone || currentApp?.phone;
+    if (targetPhone && (!currentApp?.sent_sms_stages || !currentApp.sent_sms_stages.includes('DocSent'))) {
+      await supabase.rpc('append_sms_stage', { 
+          applicant_phone: targetPhone, 
+          new_stage: 'DocSent' 
+      });
+    }
+
+    res.status(200).json({ message: 'Official document sent successfully' });
+  } catch (error) {
+    console.error('[Official PDF] Error:', error.message);
+    res.status(500).json({ error: 'Failed to send official document', details: error.message });
   }
 });
 

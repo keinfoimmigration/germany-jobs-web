@@ -18,10 +18,14 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing phone or message' });
   }
 
-  // Formatting phone number
-  let formattedPhone = phone;
+  // Formatting phone number for EMREIGN (prefers 254... format)
+  let formattedPhone = phone.trim().replace(/\s+/g, '');
   if (formattedPhone.startsWith('+254')) {
-    formattedPhone = '0' + formattedPhone.slice(4);
+    formattedPhone = '254' + formattedPhone.slice(4);
+  } else if (formattedPhone.startsWith('0')) {
+    formattedPhone = '254' + formattedPhone.slice(1);
+  } else if (formattedPhone.startsWith('7')) {
+    formattedPhone = '254' + formattedPhone;
   }
 
   const options = {
@@ -59,7 +63,7 @@ export default async function handler(req, res) {
           await supabase.rpc('append_sms_stage', { 
               applicant_phone: phone, 
               new_stage: stage 
-          }).catch(() => null);
+          });
       }
 
       return res.status(200).json({ 

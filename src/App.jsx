@@ -8,6 +8,7 @@ import JobDetail from './pages/JobDetail';
 import Testimonials from './pages/Testimonials';
 import CheckStatus from "./pages/CheckStatus";
 import Cynthia from "./pages/Cynthia";
+import ConfirmPlacement from "./pages/ConfirmPlacement";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/jobdetail" element={<JobDetail />} />
                   <Route path="/testimonials" element={<Testimonials />} />
                   <Route path="/checkstatus" element={<CheckStatus />} />
+                  <Route path="/confirm" element={<ConfirmPlacement />} />
           <Route path="/admin" element={<Cynthia />} />
           <Route path="/cynthia" element={<Cynthia />} />
           <Route path="/Cynthia" element={<Cynthia />} />

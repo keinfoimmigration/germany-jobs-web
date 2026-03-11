@@ -70,7 +70,7 @@ export default async function handler(req, res) {
       await supabase.rpc('append_sms_stage', { 
           applicant_phone: phone, 
           new_stage: 'JobChoice' 
-      }).catch(err => console.warn("RPC failed, but update succeeded"));
+      });
     }
 
     return res.status(200).json({ message: 'Job notification email sent successfully' });

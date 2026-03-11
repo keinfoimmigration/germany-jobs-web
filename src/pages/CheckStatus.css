@@ -107,6 +107,10 @@
     background: #ffc107;
 }
 
+.status-visa {
+    background: #0066cc;
+}
+
 .status-other {
     background: #6c757d;
 }
@@ -475,4 +479,101 @@
         width: 100%;
         text-align: center;
     }
+}
+/* Success Page Styles */
+.success-page-container {
+    text-align: center;
+    padding: 2rem 1rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.success-icon-large {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+}
+
+.success-header {
+    color: #059669;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.success-sub-header {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+}
+
+.success-instructions-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.success-instructions-card h3 {
+    color: #0f172a;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.doc-checklist-box {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border-left: 4px solid #003366;
+}
+
+.doc-checklist-box h4 {
+    margin-top: 0;
+    color: #003366;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.doc-checklist-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.doc-checklist-box li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    font-size: 0.95rem;
+    color: #334155;
+}
+
+.doc-checklist-box li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #059669;
+    font-weight: bold;
+}
+
+.visa-timeline-note {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.success-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
 }

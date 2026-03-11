@@ -65,6 +65,30 @@
     margin: 0;
 }
 
+.partner-card {
+    border-left-color: #059669; /* Green for active partner */
+}
+
+.partner-details {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.salary-range {
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.partner-tag {
+    color: #059669;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
 .stat-number {
     color: #003366;
     font-size: 1.5rem;
@@ -161,6 +185,11 @@
 .status-badge.rejected {
     background-color: #fee2e2;
     color: #991b1b;
+}
+
+.status-badge.visa-processing-in-progress {
+    background-color: #dbeafe;
+    color: #1e40af;
 }
 
 .send-sms-btn {
@@ -295,11 +324,74 @@
     transform: translateY(-1px);
 }
 
+.generate-doc-btn {
+    background-color: #059669;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+    margin-top: 0.5rem;
+}
+
+.generate-doc-btn:hover:not(:disabled) {
+    background-color: #047857;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.generate-doc-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .sent-history {
     font-size: 0.75rem;
     color: #666;
     margin-top: 0.5rem;
     font-style: italic;
+}
+
+.partner-info-small {
+    margin-top: 0.5rem;
+    padding: 0.4rem;
+    background: #f0fdf4;
+    border-radius: 6px;
+    border: 1px solid #dcfce7;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.partner-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #166534;
+}
+
+.partner-salary {
+    font-size: 0.7rem;
+    color: #15803d;
+    font-weight: 600;
+}
+
+.doc-sent-badge {
+    font-size: 0.7rem;
+    color: #0369a1;
+    background: #e0f2fe;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid #bae6fd;
+    font-weight: 700;
+    margin-top: 0.2rem;
+    width: fit-content;
 }
 
 @media (max-width: 768px) {
