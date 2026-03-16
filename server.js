@@ -291,6 +291,109 @@ app.post('/api/send-job-notify', async (req, res) => {
   }
 });
 
+app.post('/api/send-visa-processing', async (req, res) => {
+  const { email, applicationNumber, phone } = req.body;
+  console.log(`[Email] Attempting to send visa processing notification to: ${email} for app: ${applicationNumber}`);
+
+  if (!email || !applicationNumber) {
+    console.warn('[Email] Missing required fields');
+    return res.status(400).json({ error: 'Missing email or application number' });
+  }
+
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error('[Email] SMTP credentials NOT FOUND in .env');
+    return res.status(500).json({ error: 'Email configuration missing on server.' });
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465, // Using 465 as per your working send-confirmation config
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"Germany Jobs Immigration" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: `Update: Visa Processing Commenced - ${applicationNumber}`,
+    text: `Great News!\n\nYour application (${applicationNumber}) for the Germany Jobs program has reached the next stage.\n\nVisa processing has officially commenced. We will keep you updated on any further requirements or developments.\n\nBest regards,\nGermany Jobs Team`,
+    html: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; padding: 30px; border-radius: 12px; background-color: #ffffff;">
+        <h2 style="color: #003366; text-align: center;">Visa Processing Commenced</h2>
+        <p>Hello,</p>
+        <p>We are pleased to inform you that your application <strong>${applicationNumber}</strong> has advanced to the next crucial phase.</p>
+        
+        <div style="background: #f0fdf4; padding: 25px; border-radius: 10px; text-align: center; margin: 25px 0; border: 1px solid #dcfce7;">
+          <h3 style="margin: 0 0 10px 0; color: #166534;">Status: Visa Processing In Progress</h3>
+          <p style="color: #15803d; margin-bottom: 0; font-weight: 500;">
+            The Visa processing protocol with the German Federal Authorities has officially been initiated.
+          </p>
+        </div>
+        
+        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; border: 1px solid #bae6fd; margin-top: 20px;">
+           <h4 style="color: #0369a1; margin-top: 0; margin-bottom: 10px;">What Happens Next?</h4>
+           <p style="font-size: 14px; color: #0369a1; margin: 0;">Our team is actively managing your file with the relevant embassies. We will follow up with you if any supplementary documents or biometric appointments are required.</p>
+           <p style="font-size: 14px; color: #0369a1; margin-top: 10px; margin-bottom: 0;">You can expect to book your final interview soon. Please keep monitoring your status portal.</p>
+        </div>
+        
+        <p style="margin-top: 25px;">If you have any questions, our support team is available to assist you.</p>
+        
+        <p style="margin-top: 35px; border-top: 1px solid #eee; padding-top: 20px;">
+          Best regards,<br>
+          <strong style="color: #003366;">Administrative Director</strong><br>
+          <span style="font-size: 13px; color: #64748b;">Germany Jobs Immigration Division</span>
+        </p>
+        
+        <div style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 30px;">
+          This is an automated system update regarding your application status.
+        </div>
+      </div>
+    `,
+  };
+
+  try {
+    console.log('[Email] Sending via Nodemailer...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('[Email] SUCCESS - Message sent. ID:', info.messageId);
+    
+    if (applicationNumber) {
+        try {
+            const { data: currentApp } = await supabase
+                .from('applications')
+                .select('sent_sms_stages')
+                .eq('application_number', applicationNumber)
+                .single();
+
+            await supabase
+                .from('applications')
+                .update({ 
+                    last_sms_stage: 'VisaProcessing',
+                    last_sms_at: new Date().toISOString()
+                })
+                .eq('application_number', applicationNumber);
+            
+            if (phone && (!currentApp?.sent_sms_stages || !currentApp.sent_sms_stages.includes('VisaProcessing'))) {
+                await supabase.rpc('append_sms_stage', { 
+                    applicant_phone: phone, 
+                    new_stage: 'VisaProcessing' 
+                });
+            }
+            console.log('[Email] DB Updated for', applicationNumber);
+        } catch (dbErr) {
+            console.warn('[Email] DB Update failed:', dbErr.message);
+        }
+    }
+
+    res.status(200).json({ message: 'Visa processing notification email sent successfully', messageId: info.messageId });
+  } catch (error) {
+    console.error('[Email] Nodemailer Error:', error.message);
+    res.status(500).json({ error: 'Failed to send notification email', details: error.message });
+  }
+});
+
 app.post('/api/send-official-pdf', async (req, res) => {
   console.log('[Official PDF] POST /api/send-official-pdf');
   const { pdfBase64, email, applicationNumber, phone } = req.body;
@@ -334,9 +437,9 @@ app.post('/api/send-official-pdf', async (req, res) => {
         <div style="background: #f0fdf4; padding: 25px; border-radius: 10px; text-align: center; margin: 25px 0; border: 1px solid #dcfce7;">
           <h3 style="margin: 0 0 10px 0; color: #166534;">Offer Ref: ${applicationNumber}</h3>
           <p style="color: #15803d; margin-bottom: 20px; font-weight: 500;">Please click the button below to formally accept this employment offer.</p>
-          <a href="http://localhost:5173/confirm?ref=${applicationNumber}" 
+          <a href="https://kenyagermany-jobs.vercel.app/confirm?ref=${applicationNumber}" 
              style="background-color: #003366; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-             ACCEPT EMPLOYMENT OFFER (LOCAL TEST)
+             ACCEPT EMPLOYMENT OFFER
           </a>
         </div>
 
@@ -417,6 +520,62 @@ app.post('/api/send-official-pdf', async (req, res) => {
   } catch (error) {
     console.error('[Official PDF] Error:', error.message);
     res.status(500).json({ error: 'Failed to send official document', details: error.message });
+  }
+});
+
+app.post('/api/send-receipt-pdf', async (req, res) => {
+  console.log('[Receipt PDF] POST /api/send-receipt-pdf');
+  const { pdfBase64, email, applicationNumber } = req.body;
+  
+  if (!pdfBase64 || !email || !applicationNumber) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"Germany Jobs Finance" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: `PAYMENT RECEIPT: Visa Processing Fee - ${applicationNumber}`,
+    text: `Dear Candidate,\n\nThank you for your payment. Please find your official payment receipt for the Visa Processing Fee attached to this email.\n\nBest regards,\nGermany Jobs Finance Team`,
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
+        <h2 style="color: #003366;">Payment Receipt Confirmation</h2>
+        <p>Dear Candidate,</p>
+        <p>This is to confirm that we have received your payment for the <strong>Visa Processing Fee</strong> regarding application <strong>${applicationNumber}</strong>.</p>
+        <p>Attached to this email is your official electronic receipt. Please keep it for your records.</p>
+        <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-left: 4px solid #003366;">
+          <strong>Amount Paid:</strong> Ksh 6,500.00<br/>
+          <strong>Status:</strong> Processed & Verified
+        </div>
+        <p>We are now proceeding with your visa processing. We will keep you updated on the progress.</p>
+        <p>Best regards,<br/><strong>Germany Jobs Team</strong></p>
+      </div>
+    `,
+    attachments: [
+      {
+        filename: `Receipt_${applicationNumber}.pdf`,
+        content: pdfBase64.split('base64,')[1],
+        encoding: 'base64',
+      },
+    ],
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('[Receipt PDF] Sent:', info.messageId);
+    res.status(200).json({ message: 'Payment receipt email sent successfully' });
+  } catch (error) {
+    console.error('[Receipt PDF] Error:', error.message);
+    res.status(500).json({ error: 'Failed to send receipt email', details: error.message });
   }
 });
 

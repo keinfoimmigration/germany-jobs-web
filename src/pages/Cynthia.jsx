@@ -17,7 +17,10 @@ export default function Cynthia() {
         "Interview": (ref) => `Congratulations! You've been shortlisted for an interview regarding your Germany Jobs application (Ref: ${ref}). Please check your email for the schedule.`,
         "Approved": (ref) => `Excellent news! Your Germany Jobs application (Ref: ${ref}) has been approved. Please visit our website tracker to select your preferred job role. Welcome aboard!`,
         "Rejected": (ref) => `Thank you for your interest in Germany Jobs. Regarding application ${ref}, we regret to inform you that we won't be moving forward at this time. We wish you the best.`,
-        "JobChoice": (ref) => `Congratulations! Your Germany application ${ref} is approved. Please visit our portal now to select your preferred job role from the 500+ available positions. Welcome aboard!`
+        "JobChoice": (ref) => `Congratulations! Your Germany application ${ref} is approved. Please visit our portal now to select your preferred job role from the 500+ available positions. Welcome aboard!`,
+        "JobChoiceReminder": (ref) => `Reminder: Please check your application status (${ref}) on our portal and choose your preferred job and sub-job to proceed with your Germany Jobs application.`,
+        "VisaProcessing": (ref) => `Great News! Your Visa processing for Germany application ${ref} has officially commenced. We will keep you updated on any further requirements.`,
+        "PaymentServiceRestored": (ref) => `We apologize for the inconvenience caused to applicants who were attempting to pay the visa processing fee while the payment service was temporarily unavailable. The service is now restored. Please proceed with the visa processing fee payment. Thank you.`
     };
 
     const jobPartnerMapping = {
@@ -268,6 +271,138 @@ export default function Cynthia() {
                 setApplicants(prev => prev.map(a => 
                     a.application_number === app.application_number 
                     ? { ...a, sent_sms_stages: [...(a.sent_sms_stages || []), "JobChoice"] } 
+                    : a
+                ));
+            }
+        } catch (error) {
+            Swal.fire({
+                title: "Notification Failed",
+                text: error.message,
+                icon: "error",
+                confirmButtonColor: "#003366"
+            });
+        } finally {
+            setSendingSms(prev => ({ ...prev, [app.application_number]: false }));
+        }
+    };
+
+    const sendJobChoiceReminder = async (app) => {
+        if (sendingSms[app.application_number]) return;
+        
+        const result = await Swal.fire({
+            title: "Send Job Choice Reminder?",
+            text: `This will send an SMS reminder to ${app.phone} to choose a job and sub-job.`,
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Send Reminder",
+            confirmButtonColor: "#8b5cf6"
+        });
+
+        if (!result.isConfirmed) return;
+
+        setSendingSms(prev => ({ ...prev, [app.application_number]: true }));
+
+        try {
+            const smsMessage = smsTemplates["JobChoiceReminder"](app.application_number);
+            const smsRes = await fetch("/api/send-sms", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    phone: app.phone, 
+                    message: smsMessage, 
+                    stage: "JobChoiceReminder", 
+                    applicationNumber: app.application_number 
+                })
+            });
+
+            if (smsRes.ok) {
+                Swal.fire("Reminder Sent!", "Candidate has been reminded to choose a job.", "success");
+                setApplicants(prev => prev.map(a => 
+                    a.application_number === app.application_number 
+                    ? { ...a, sent_sms_stages: [...(a.sent_sms_stages || []), "JobChoiceReminder"] } 
+                    : a
+                ));
+            } else {
+                throw new Error("Failed to send SMS reminder");
+            }
+        } catch (error) {
+            Swal.fire("Reminder Failed", error.message, "error");
+        } finally {
+            setSendingSms(prev => ({ ...prev, [app.application_number]: false }));
+        }
+    };
+
+    const sendVisaProcessingNotification = async (app) => {
+        if (sendingSms[app.application_number]) return;
+
+        const result = await Swal.fire({
+            title: "Notify Visa Processing?",
+            text: `Send Email and SMS to ${app.phone} confirming Visa Processing has commenced?`,
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Notify Candidate",
+            confirmButtonColor: "#059669" // Green to signify progress
+        });
+
+        if (!result.isConfirmed) return;
+
+        setSendingSms(prev => ({ ...prev, [app.application_number]: true }));
+
+        try {
+            // 1. Send SMS
+            let smsSuccess = false;
+            try {
+                const smsMessage = smsTemplates["VisaProcessing"](app.application_number);
+                const smsRes = await fetch("/api/send-sms", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ phone: app.phone, message: smsMessage, stage: "VisaProcessing", applicationNumber: app.application_number })
+                });
+                if (smsRes.ok) smsSuccess = true;
+            } catch (err) { console.warn("SMS failed", err); }
+
+            // 2. Send Email
+            let emailSuccess = false;
+            let emailErrText = "";
+            try {
+                const emailRes = await fetch("/api/send-visa-processing", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: app.email, applicationNumber: app.application_number, phone: app.phone })
+                });
+
+                if (emailRes.ok) {
+                    emailSuccess = true;
+                } else {
+                    const jsonErr = await emailRes.json().catch(() => ({ error: "Server error" }));
+                    emailErrText = jsonErr.error || "Unknown error";
+                }
+            } catch (err) { emailErrText = err.message; }
+
+            if (smsSuccess && emailSuccess) {
+                Swal.fire("Success!", "Candidate notified of Visa Processing via SMS and Email.", "success");
+            } else if (smsSuccess && !emailSuccess) {
+                Swal.fire({
+                    title: "SMS Sent, Email Failed",
+                    text: `SMS dispatched successfully, but email failed: ${emailErrText}.`,
+                    icon: "warning",
+                    confirmButtonColor: "#f59e0b"
+                });
+            } else if (!smsSuccess && emailSuccess) {
+                Swal.fire({
+                    title: "Email Sent, SMS Failed",
+                    text: "Email dispatched successfully, but the SMS service returned an error.",
+                    icon: "warning",
+                    confirmButtonColor: "#f59e0b"
+                });
+            } else {
+                throw new Error(`Both notification methods failed. Email error: ${emailErrText}`);
+            }
+
+            if (smsSuccess) {
+                setApplicants(prev => prev.map(a => 
+                    a.application_number === app.application_number 
+                    ? { ...a, sent_sms_stages: [...(a.sent_sms_stages || []), "VisaProcessing"] } 
                     : a
                 ));
             }
@@ -719,6 +854,16 @@ export default function Cynthia() {
                                                                 >
                                                                     🎯 Nudge All
                                                                 </button>
+                                                                {app.last_sms_stage === "JobChoice" && (
+                                                                    <button 
+                                                                        className="reminder-job-btn"
+                                                                        onClick={() => sendJobChoiceReminder(app)}
+                                                                        title="Send Job Choice Reminder"
+                                                                        disabled={sendingSms[app.application_number] || (app.sent_sms_stages || []).includes("JobChoiceReminder")}
+                                                                    >
+                                                                        ⏳ Remind to Choose Job
+                                                                    </button>
+                                                                )}
                                                             </>
                                                         )}
 
@@ -727,11 +872,38 @@ export default function Cynthia() {
                                                                 className="generate-doc-btn"
                                                                 onClick={() => generateAndSendOfficialPDF(app)}
                                                                 title="Generate Professional PDF Seal"
-                                                                disabled={sendingSms[app.application_number]}
+                                                                disabled={sendingSms[app.application_number] || app.official_document_sent === 1 || app.official_document_sent === true}
                                                             >
                                                                 📜 Send Official Doc
                                                             </button>
                                                         )}
+                                                    </div>
+                                                )}
+
+                                                {app.status === "Visa Processing" && (
+                                                    <div className="approved-specific-actions">
+                                                        <button 
+                                                            className="nudge-job-btn"
+                                                            onClick={() => sendVisaProcessingNotification(app)}
+                                                            title="Send Visa Processing Started Notification"
+                                                            disabled={sendingSms[app.application_number] || (app.sent_sms_stages || []).includes("VisaProcessing")}
+                                                            style={{ backgroundColor: "#059669", color: "white" }}
+                                                        >
+                                                            ✈️ Notify Visa Processing
+                                                        </button>
+                                                    </div>
+                                                )}
+                                                {app.status === "Visa processing in progress" && (
+                                                    <div className="approved-specific-actions">
+                                                        <button 
+                                                            className="quick-notify-btn"
+                                                            onClick={() => sendSms(app.phone, app.application_number, "PaymentServiceRestored")}
+                                                            title="Notify that payment service is back online"
+                                                            disabled={sendingSms[app.application_number]}
+                                                            style={{ backgroundColor: "#8b5cf6", color: "white" }}
+                                                        >
+                                                            🔔 Service restored
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
